@@ -49,6 +49,7 @@ class FullscreenActivity : AppCompatActivity() {
                 super.onPageFinished(view, url)
 
                 // Once the page is loaded, hide the splash screen and show the WebView
+                hideHandler.postDelayed(hideRunnable,0)
                 if (!splashShown) {
                     hideSplash()
                 }
@@ -85,6 +86,5 @@ class FullscreenActivity : AppCompatActivity() {
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
-        hideHandler.postDelayed(hideRunnable, 3000)
     }
 }
