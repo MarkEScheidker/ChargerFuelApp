@@ -1,5 +1,6 @@
 package com.example.chargerfuelapp
 
+import android.app.Dialog
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -9,8 +10,12 @@ import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.Button
+import android.widget.FrameLayout
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.example.chargerfuelapp.databinding.ActivityFullscreenBinding
+import com.example.chargerfuelapp.databinding.ErrorLayoutBinding
 
 class FullscreenActivity : AppCompatActivity() {
     private lateinit var binding: ActivityFullscreenBinding
@@ -66,6 +71,15 @@ class FullscreenActivity : AppCompatActivity() {
                     )
                 }
             }
+
+            override fun onReceivedError(view: WebView?, errorCode: Int, description: String?, failingUrl: String?) {
+                if (errorCode == WebViewClient.ERROR_HOST_LOOKUP) {
+                    // Show an error screen with a refresh button
+                    showErrorMessage()
+                } else {
+                    super.onReceivedError(view, errorCode, description, failingUrl)
+                }
+            }
         }
     }
 
@@ -118,6 +132,28 @@ class FullscreenActivity : AppCompatActivity() {
             splashShown = false
         }, 650)
     }
+
+    private fun showErrorMessage() {
+        // Set the WebView to be invisible
+        webView.visibility = View.INVISIBLE
+
+        // Inflate the error layout
+        val errorLayout = layoutInflater.inflate(R.layout.error_layout, null)
+
+        // Set the refresh button click listener
+        val refreshButton = errorLayout.findViewById<Button>(R.id.refresh_button)
+        refreshButton.setOnClickListener {
+            errorLayout.visibility = View.GONE
+            webView.visibility = View.VISIBLE
+            webView.reload()
+        }
+
+        // Add the error layout to the root view
+        val params = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
+        val rootView = findViewById<View>(android.R.id.content) as FrameLayout
+        rootView.addView(errorLayout, params)
+    }
+
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
